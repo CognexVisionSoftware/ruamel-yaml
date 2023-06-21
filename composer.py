@@ -107,10 +107,10 @@ class Composer:
             event = self.parser.get_event()
             alias = event.anchor
             if alias not in self.anchors:
-                raise ComposerError(
-                    None, None, f'found undefined alias {alias!r}', event.start_mark,
-                )
-            return self.return_alias(self.anchors[alias])
+                event.anchor = None
+                self.current_event = event
+            else:
+                return self.return_alias(self.anchors[alias])
         event = self.parser.peek_event()
         anchor = event.anchor
         if anchor is not None:  # have an anchor
@@ -128,7 +128,26 @@ class Composer:
             node = self.compose_sequence_node(anchor)
         elif self.parser.check_event(MappingStartEvent):
             node = self.compose_mapping_node(anchor)
+        else:
+            node = self.compose_scalar_node_from_wrong_alias(anchor)
         self.resolver.ascend_resolver()
+        return node
+
+    def compose_scalar_node_from_wrong_alias(self, anchor):
+        # type: (Any) -> Any
+        event = self.parser.get_event()
+        tag = self.resolver.resolve(ScalarNode, "", [True])
+        node = ScalarNode(
+            tag,
+            "",
+            event.start_mark,
+            event.end_mark,
+            style='"',
+            comment=event.comment,
+            anchor=anchor,
+        )
+        if anchor is not None:
+            self.anchors[anchor] = node
         return node
 
     def compose_scalar_node(self, anchor: Any) -> Any:
