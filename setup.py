@@ -276,6 +276,7 @@ class NameSpacePackager(object):
         assert isinstance(pkg_data, dict)
         self._pkg_data = pkg_data
         self.full_package_name = self._pkg_data['full_package_name']
+        self.full_package_name_alias = self._pkg_data['full_package_name_alias']
         self._split = None
         self._extra_packages = []
         self.depth = self.full_package_name.count('.')
@@ -481,7 +482,7 @@ class NameSpacePackager(object):
         sp = self.full_package_name
         for ch in '_.':
             sp = sp.replace(ch, '-')
-        base_url = self._pkg_data.get('url', 'https://sourceforge.net/p/{0}'.format(sp))
+        base_url = self._pkg_data.get('url', 'https://github.com/CognexVisionSoftware/{0}.git'.format(sp))
         if base_url[-1] != '/':
             base_url += '/'
         ret_val['Home'] = base_url
@@ -847,7 +848,7 @@ def main():
         cmdclass['bdist_wheel'] = MyBdistWheel
 
     kw = dict(  # NOQA: C408
-        name=nsp.full_package_name,
+        name=nsp.full_package_name_alias,
         metadata_version="1.0",
         version=version_str,
         packages=nsp.packages,
