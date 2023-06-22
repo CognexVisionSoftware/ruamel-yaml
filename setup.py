@@ -311,6 +311,7 @@ class NameSpacePackager(object):
         assert isinstance(pkg_data, dict)
         self._pkg_data = pkg_data
         self.full_package_name = self.pn(self._pkg_data['full_package_name'])
+        self.full_package_name_alias = self.pn(self._pkg_data['full_package_name_alias'])
         self._split = None
         self.depth = self.full_package_name.count('.')
         self.nested = self._pkg_data.get('nested', False)
@@ -524,7 +525,7 @@ class NameSpacePackager(object):
         sp = self.full_package_name
         for ch in '_.':
             sp = sp.replace(ch, '-')
-        return 'https://sourceforge.net/p/{0}/code/ci/default/tree'.format(sp)
+        return 'https://github.com/CognexVisionSoftware/{0}.git'.format(sp)
 
     @property
     def author(self):
@@ -849,7 +850,7 @@ def main():
         cmdclass['bdist_wheel'] = MyBdistWheel
 
     kw = dict(
-        name=nsp.full_package_name,
+        name=nsp.full_package_name_alias,
         version=version_str,
         packages=nsp.packages,
         python_requires=nsp.python_requires,
